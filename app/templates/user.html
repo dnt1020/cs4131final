@@ -1,4 +1,4 @@
-<!-- User prof pic on: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-vi-profile-page-and-avatars -->
+<!-- User prof pic on: https://blog.miguelgrinberg.com/review/the-flask-mega-tutorial-part-vi-profile-page-and-avatars -->
 
 {% extends "base.html" %}
 
@@ -17,7 +17,7 @@
         </tr>
     </table>
     <hr>
-    {% for post in posts %}
-        {% include '_post.html' %}
+    {% for review in reviews %}
+        {% include '_review.html' %}
     {% endfor %}
 {% endblock %}
