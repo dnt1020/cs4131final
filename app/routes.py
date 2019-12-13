@@ -1,10 +1,13 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, RequestForm
 from flask_login import current_user, login_user
-from app.models import User
+from app.models import User, Pair, History
 from flask_login import logout_user, login_required
 from werkzeug.urls import url_parse
+
+# WHEN LOGGING OUT AND THEN LOGGING BACK IN AN ERROR HAPPENS
+
 
 #for record last visit time:
 from datetime import datetime
@@ -38,6 +41,9 @@ def login():
             flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
+
+##SOMETHING HERE MESSED UP??
+
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
@@ -101,3 +107,33 @@ def edit_profile():
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
+
+
+@app.route('/requests', methods=['GET', 'POST'])
+@login_required
+def requests():
+    ## THIS ISN'T A REAL FORM YET
+    form = RequestForm()
+    if form.validate_on_submit():
+
+        ##Check if pairing already exists
+        checkEntry = Pair.query.filter(Pair.wine == form.wine.data, Pair.food == form.food.data)
+        if (len(checkEntry.all()) > 0):
+            ## if already exists
+            pair = checkEntry[0]
+        else:
+            ## get wine and food from something
+            pair = Pair(wine = form.wine.data, food = form.food.data)
+            db.session.add(pair)
+            db.session.commit()
+            ## IDK WHAT THIS DOES
+            flash('added pairing??')
+
+        ## FIX FAVORITE THING ValidationError
+        #add pairing to History
+        history = History(pairing = pair, user = current_user, favorite = form.fave.data)
+        db.session.add(history)
+        db.session.commit()
+        flash('added history??')
+
+    return render_template("requests.html", form=form)

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Hi, {{ current_user.username }}!</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.wine.label }}<br>
+            {{ form.wine(cols=32, rows=4) }}<br>
+            {% for error in form.wine.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.food.label }}<br>
+            {{ form.food(cols=32, rows=4) }}<br>
+            {% for error in form.food.errors %}
+            <span style="color: blue;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.fave.label }}<br>
+            {{ form.fave(cols=32, rows=4) }}<br>
+            {% for error in form.fave.errors %}
+            <span style="color: green;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+<!--    {% for post in posts %}
+    <p>
+    {{ post.author.username }} says: <b>{{ post.body }}</b>
+    </p>
+    {% endfor %} -->
+{% endblock %}

@@ -17,6 +17,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index = True, unique = True)
     password_hash = db.Column(db.String(128))
     review = db.relationship('Review', backref = 'author', lazy = 'dynamic')
+    history = db.relationship('History', backref = 'user', lazy = 'dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -50,8 +51,18 @@ class Pair(db.Model):
     wine = db.Column(db.String(140))
     food = db.Column(db.String(140))
     review = db.relationship('Review', backref = 'pairing', lazy = 'dynamic')
-    #history = db.relationship('History', backref = 'pairing', lazy = 'dynamic')
-    timestamp = db.Column(db.DateTime, index = True, default = datetime.utcnow)
+    history = db.relationship('History', backref = 'pairing', lazy = 'dynamic')
 
     def __repr__(self):
-        return '<Pair {}>'.format(self.wine + self.food)
+        return '<Pair {} + {}>'.format(self.wine, self.food)
+
+
+class History(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    pair_id = db.Column(db.Integer, db.ForeignKey('pair.id'))
+    favorite = db.Column(db.Boolean)
+    time = db.Column(db.DateTime, index = True, default = datetime.utcnow)
+
+    def __repr__(self):
+        return '<History {} {}>'.format(self.id, self.time)
