@@ -2,6 +2,7 @@
 
 {% block content %}
     <h1>Hi, {{ current_user.username }}!</h1>
+    
     {% for review in reviews %}
     <div><p>{{ review.author.username }} says: <b>{{ review.body }}</b></p></div>
     {% endfor %}

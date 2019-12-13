@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, IntegerField
 from wtforms.validators import DataRequired, ValidationError, DataRequired, Email, EqualTo, Length
 from app.models import User
 
@@ -39,4 +39,10 @@ class RequestForm(FlaskForm):
     food = TextAreaField('food', validators=[Length(min=1, max=140)])
     ## CHANGE THIS SOMETIME
     fave = BooleanField()
+    submit = SubmitField('Submit')
+
+class ReviewForm(FlaskForm):
+    review = TextAreaField('Enter Review', validators=[Length(min=1, max=140)])
+    ## VALIDATOR???
+    rate = IntegerField('Enter rating')
     submit = SubmitField('Submit')

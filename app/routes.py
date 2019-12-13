@@ -1,8 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, RequestForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, RequestForm, ReviewForm
 from flask_login import current_user, login_user
-from app.models import User, Pair, History
+from app.models import User, Pair, History, Review
 from flask_login import logout_user, login_required
 from werkzeug.urls import url_parse
 
@@ -76,11 +76,11 @@ def register():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    reviews = [
-        {'author': user, 'body': 'Test review #1'},
-        {'author': user, 'body': 'Test review #2'}
-    ]
-    return render_template('user.html', user=user, reviews=reviews)
+    pairings = User.query.join(User.history).filter(user.id == id)
+
+    reviews = Review.query.filter(Review.user_id == user.id)
+
+    return render_template('user.html', user=user, reviews=reviews, history = pairings)
 
 
 #For recording last visit time
@@ -131,9 +131,34 @@ def requests():
 
         ## FIX FAVORITE THING ValidationError
         #add pairing to History
-        history = History(pairing = pair, user = current_user, favorite = form.fave.data)
+        u = User.query.get(current_user.id)
+        print("id: " + u.username)
+        history = History(pairing = pair, user = u, favorite = form.fave.data)
         db.session.add(history)
         db.session.commit()
         flash('added history??')
 
     return render_template("requests.html", form=form)
+
+
+#### HANDLE IF PAIRING ID DOESN'T EXIST
+
+@app.route('/pairing/<id>', methods=['GET', 'POST'])
+@login_required
+def pairing(id):
+
+    ## CHECK TO MAKE SURE WAS GIVEN THE PAIRING TO BE ABLE TO MAKE A REVIEW
+    form = ReviewForm()
+    ## NEED TO FIGURE OUT HOW TO GET THE PAIRING ID
+    if form.validate_on_submit():
+        review = Review(body = form.review.data, rating = form.rate.data, author = current_user, pairing = Pair.query.get(id))
+        db.session.add(review)
+        db.session.commit()
+        flash('Review updated')
+        return redirect(url_for('index'))
+
+    pair = Pair.query.filter_by(id = id).first_or_404()
+
+    reviews = Review.query.filter(Review.pair_id == id)
+
+    return render_template('pair.html', pair=pair, reviews=reviews, form = form)
