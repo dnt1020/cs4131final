@@ -16,7 +16,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index = True, unique = True)
     email = db.Column(db.String(120), index = True, unique = True)
     password_hash = db.Column(db.String(128))
-    posts = db.relationship('Post', backref = 'author', lazy = 'dynamic')
+    review = db.relationship('Review', backref = 'author', lazy = 'dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -34,12 +34,24 @@ class User(UserMixin, db.Model):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, size)
 
-
-class Post(db.Model):
+class Review(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     body = db.Column(db.String(140))
+    rating = db.Column(db.Integer)
     timestamp = db.Column(db.DateTime, index = True, default = datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    pair_id = db.Column(db.Integer, db.ForeignKey('pair.id'))
 
     def __repr__(self):
-        return '<Post {}>'.format(self.body)
+        return '<Review {}>'.format(self.body)
+
+class Pair(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    wine = db.Column(db.String(140))
+    food = db.Column(db.String(140))
+    review = db.relationship('Review', backref = 'pairing', lazy = 'dynamic')
+    #history = db.relationship('History', backref = 'pairing', lazy = 'dynamic')
+    timestamp = db.Column(db.DateTime, index = True, default = datetime.utcnow)
+
+    def __repr__(self):
+        return '<Pair {}>'.format(self.wine + self.food)
