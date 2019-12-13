@@ -14,7 +14,7 @@ from datetime import datetime
 @login_required
 def index():
     user = {'username': 'Miguel'}
-    posts = [
+    reviews = [
         {
             'author': {'username': 'John'},
             'body': 'Beautiful day in Portland!'
@@ -24,7 +24,7 @@ def index():
             'body': 'The Avengers movie was so cool!'
         }
     ]
-    return render_template('index.html', title='Home', posts=posts)
+    return render_template('index.html', title='Home', reviews=reviews)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -50,6 +50,7 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -69,11 +70,11 @@ def register():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    posts = [
-        {'author': user, 'body': 'Test post #1'},
-        {'author': user, 'body': 'Test post #2'}
+    reviews = [
+        {'author': user, 'body': 'Test review #1'},
+        {'author': user, 'body': 'Test review #2'}
     ]
-    return render_template('user.html', user=user, posts=posts)
+    return render_template('user.html', user=user, reviews=reviews)
 
 
 #For recording last visit time
