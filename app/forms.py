@@ -35,11 +35,9 @@ class EditProfileForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class RequestForm(FlaskForm):
-    wine = TextAreaField('wine', validators=[Length(min=1, max=140)])
-    food = TextAreaField('food', validators=[Length(min=1, max=140)])
-    ## CHANGE THIS SOMETIME
-    fave = BooleanField()
-    submit = SubmitField('Submit')
+    wine = StringField("Wine", default = "")
+    food = StringField("Food", default = "")
+    submit = SubmitField("Submit")
 
 class ReviewForm(FlaskForm):
     review = TextAreaField('Enter Review', validators=[Length(min=1, max=140)])

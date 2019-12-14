@@ -1,4 +1,5 @@
 from flask import render_template, flash, redirect, url_for, request
+import requests
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, RequestForm, ReviewForm
 from flask_login import current_user, login_user
@@ -8,6 +9,7 @@ from werkzeug.urls import url_parse
 
 # WHEN LOGGING OUT AND THEN LOGGING BACK IN AN ERROR HAPPENS
 
+API_KEY = "3495005704df46f9a4bad5b39efc4023"
 
 #for record last visit time:
 from datetime import datetime
@@ -16,6 +18,7 @@ from datetime import datetime
 @app.route('/index')
 @login_required
 def index():
+    form = RequestForm()
     user = {'username': 'Miguel'}
     reviews = [
         {
@@ -27,7 +30,7 @@ def index():
             'body': 'The Avengers movie was so cool!'
         }
     ]
-    return render_template('index.html', title='Home', reviews=reviews)
+    return render_template('index.html', title='Home', reviews=reviews, form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -108,38 +111,65 @@ def edit_profile():
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
 
-
-@app.route('/requests', methods=['GET', 'POST'])
-@login_required
-def requests():
-    ## THIS ISN'T A REAL FORM YET
+## DOES API LOOKUP
+@app.route('/pairs', methods=['POST','GET'])
+def apiLookup():
     form = RequestForm()
     if form.validate_on_submit():
+        wine = form.wine.data
+        food = form.food.data
+    else:
+        print("nonvalid")
+        return render_template("index.html", form=form)
 
-        ##Check if pairing already exists
-        checkEntry = Pair.query.filter(Pair.wine == form.wine.data, Pair.food == form.food.data)
-        if (len(checkEntry.all()) > 0):
-            ## if already exists
-            pair = checkEntry[0]
-        else:
-            ## get wine and food from something
-            pair = Pair(wine = form.wine.data, food = form.food.data)
-            db.session.add(pair)
-            db.session.commit()
-            ## IDK WHAT THIS DOES
-            flash('added pairing??')
+    if wine != "":
+        url = "https://api.spoonacular.com/food/wine/dishes?wine=" + wine  + "&apiKey=" + API_KEY
+        response = requests.get(url)
+        foodpairings = list()
+        for x in response.json()[u'pairings']:
+            foodpairings.append(x.encode("ascii"))
+            print(x.encode("ascii"))
+        return render_template("pairings.html", wine = wine, foodpairings = foodpairings)
+    else:
+        url = "https://api.spoonacular.com/food/wine/pairing?food=" + food + "&apiKey=" + API_KEY
+        response = requests.get(url)
+        winepairings = list()
+        for x in response.json()[u'pairedWines']:
+            winepairings.append(x.encode("ascii"))
+            print(x.encode("ascii"))
+        return render_template("pairings.html", food = food, winepairings = winepairings)
 
-        ## FIX FAVORITE THING ValidationError
-        #add pairing to History
-        u = User.query.get(current_user.id)
-        print("id: " + u.username)
-        history = History(pairing = pair, user = u, favorite = form.fave.data)
-        db.session.add(history)
+## CALLED FROM JS AFTER USER PRESSES A PAIR 
+@app.route('/history', methods=['GET', 'POST'])
+@login_required
+def history():
+    wine = request.args.get('wine', 1)
+    food = request.args.get('food', 1)
+
+    ##Check if pairing already exists
+    checkEntry = Pair.query.filter(Pair.wine == wine, Pair.food == food)
+    if (len(checkEntry.all()) > 0):
+        ## if already exists
+        pair = checkEntry[0]
+    else:
+        ## get wine and food from something
+        pair = Pair(wine = wine, food = food)
+        db.session.add(pair)
         db.session.commit()
-        flash('added history??')
+        ## IDK WHAT THIS DOES
+        print('added pairing??')
 
-    return render_template("requests.html", form=form)
+    ## FIX FAVORITE THING ValidationError
+    #add pairing to History
+    u = User.query.get(current_user.id)
+    print("id: " + u.username)
+    #change favorites to be variable?
+    history = History(pairing = pair, user = u, favorite = True)
+    db.session.add(history)
+    db.session.commit()
+    print('added history??')
 
+    return "success"
 
 #### HANDLE IF PAIRING ID DOESN'T EXIST
 
