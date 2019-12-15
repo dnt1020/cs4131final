@@ -79,9 +79,15 @@ def register():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    pairings = User.query.join(User.history).filter(user.id == id)
+
+
+
+    pairings = History.query.filter(History.user_id == user.id)
 
     reviews = Review.query.filter(Review.user_id == user.id)
+
+    for i in pairings:
+        print(i.user)
 
     return render_template('user.html', user=user, reviews=reviews, history = pairings)
 
@@ -139,7 +145,7 @@ def apiLookup():
             print(x.encode("ascii"))
         return render_template("pairings.html", food = food, winepairings = winepairings)
 
-## CALLED FROM JS AFTER USER PRESSES A PAIR 
+## CALLED FROM JS AFTER USER PRESSES A PAIR
 @app.route('/history', methods=['GET', 'POST'])
 @login_required
 def history():
@@ -190,5 +196,7 @@ def pairing(id):
     pair = Pair.query.filter_by(id = id).first_or_404()
 
     reviews = Review.query.filter(Review.pair_id == id)
+
+    pairings = History.query.filter(History.user_id == current_user.id)
 
     return render_template('pair.html', pair=pair, reviews=reviews, form = form)
