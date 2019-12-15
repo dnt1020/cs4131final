@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Hi, {{ current_user.username }}!</h1>
+    
+    {% for review in reviews %}
+    <div><p>{{ review.author.username }} says: <b>{{ review.body }}</b></p></div>
+    {% endfor %}
+
+    <form action="/pairs" method="post">
+        {{ form.hidden_tag() }}
+        {{ form.food.label }}
+        {{ form.food }}
+
+        <br>
+        <br>
+
+        {{ form.wine.label }}
+        {{ form.wine }}
+
+        <br>
+        <br>
+
+        {{ form.submit() }}
+
+    </form>
+{% endblock %}
