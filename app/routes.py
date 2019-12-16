@@ -70,7 +70,11 @@ def user(username):
     sorted_history = history.order_by(History.time.desc())
     page = request.args.get('page', 1, type=int)
     reviews = current_user.reviews.paginate(page, app.config['POSTS_PER_PAGE'], False)
-    return render_template('user.html', user=user, reviews=reviews.items, historys = sorted_history)
+    next_url = url_for('user',username=current_user.username, page=reviews.next_num) \
+        if reviews.has_next else None
+    prev_url = url_for('user', username=current_user.username, page=reviews.prev_num) \
+        if reviews.has_prev else None
+    return render_template('user.html', user=user, reviews=reviews.items, historys = sorted_history, next_url=next_url, prev_url=prev_url)
 
 
 #For recording last visit time
