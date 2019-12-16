@@ -13,7 +13,6 @@ def load_user(id):
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(64), index = True, unique = True)
-    email = db.Column(db.String(120), index = True, unique = True)
     password_hash = db.Column(db.String(128))
     reviews = db.relationship('Review', backref = 'author', lazy = 'dynamic')
     history = db.relationship('History', backref = 'user', lazy = 'dynamic')
@@ -29,10 +28,6 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    ## USER PROF PIC
-    def avatar(self, size):
-        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
-        return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, size)
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -56,16 +51,11 @@ class Pair(db.Model):
     def __repr__(self):
         return '<Pair {} + {}>'.format(self.wine, self.food)
 
-    def pic(self, size):
-        digest = md5(self.food.lower().encode('utf-8')).hexdigest()
-        return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, size)
-
 
 class History(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     pair_id = db.Column(db.Integer, db.ForeignKey('pair.id'))
-    favorite = db.Column(db.Boolean)
     time = db.Column(db.DateTime, index = True, default = datetime.utcnow)
 
     def __repr__(self):

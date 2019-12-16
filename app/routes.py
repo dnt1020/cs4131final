@@ -6,10 +6,9 @@ from flask_login import current_user, login_user
 from app.models import User, Pair, History, Review
 from flask_login import logout_user, login_required
 from werkzeug.urls import url_parse
+from config import Config
 
-# WHEN LOGGING OUT AND THEN LOGGING BACK IN AN ERROR HAPPENS
-
-API_KEY = "3495005704df46f9a4bad5b39efc4023"
+API_KEY = Config.API_KEY
 
 #for record last visit time:
 from datetime import datetime
@@ -19,17 +18,8 @@ from datetime import datetime
 @login_required
 def index():
     form = RequestForm()
-    user = {'username': 'Miguel'}
-    reviews = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
+    user = {}
+    reviews = []
     return render_template('index.html', title='Home', reviews=reviews, form=form)
 
 
@@ -44,9 +34,6 @@ def login():
             flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
-
-##SOMETHING HERE MESSED UP??
-
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
@@ -66,7 +53,7 @@ def register():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
+        user = User(username=form.username.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -79,12 +66,11 @@ def register():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-
     history = History.query.filter(History.user_id == user.id)
-
-    reviews = Review.query.filter(Review.user_id == user.id)
-
-    return render_template('user.html', user=user, reviews=reviews, historys = history)
+    sorted_history = history.order_by(History.time.desc())
+    page = request.args.get('page', 1, type=int)
+    reviews = current_user.reviews.paginate(page, app.config['POSTS_PER_PAGE'], False)
+    return render_template('user.html', user=user, reviews=reviews.items, historys = sorted_history)
 
 
 #For recording last visit time
@@ -169,19 +155,16 @@ def history():
         ## if already exists
         pair = checkEntry[0]
     else:
-        ## get wine and food from something
         pair = Pair(wine = wine, food = food)
         db.session.add(pair)
         db.session.commit()
-        ## IDK WHAT THIS DOES
-        print('added pairing??')
 
     ## FIX FAVORITE THING ValidationError
     #add pairing to History
     u = User.query.get(current_user.id)
     print("id: " + u.username)
     #change favorites to be variable?
-    history = History(pairing = pair, user = u, favorite = True)
+    history = History(pairing = pair, user = u)
     db.session.add(history)
     db.session.commit()
     print('added history??')
@@ -189,24 +172,31 @@ def history():
 
     return jsonify({'pairid': pair.id})
 
-#### HANDLE IF PAIRING ID DOESN'T EXIST
-
 @app.route('/pairing/<id>', methods=['GET', 'POST'])
 @login_required
 def pairing(id):
 
     pair = Pair.query.filter_by(id = id).first_or_404()
-
     reviews = Review.query.filter(Review.pair_id == id)
 
-    pairings = History.query.filter(History.user_id == current_user.id)
+    page = request.args.get('page', 1, type=int)
+    limited_reviews = reviews.paginate(page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('pairing',id=id, page=limited_reviews.next_num) \
+        if limited_reviews.has_next else None
+    prev_url = url_for('pairing',id=id, page=limited_reviews.prev_num) \
+        if limited_reviews.has_prev else None
 
-    ## CHECK TO MAKE SURE WAS GIVEN THE PAIRING TO BE ABLE TO MAKE A REVIEW
+
+    pairings = History.query.filter(History.user_id == current_user.id)
+    show_rating = True
+    q = History.query.filter(History.user_id == current_user.id, History.pair_id == id).first()
+    if q == None:
+         show_rating = False
+
     form = ReviewForm()
-    ## NEED TO FIGURE OUT HOW TO GET THE PAIRING ID
     if form.validate_on_submit():
         review = Review(body = form.review.data, rating = form.rate.data, author = current_user, pairing = Pair.query.get(id))
         db.session.add(review)
         db.session.commit()
-    
-    return render_template('pair.html', pair=pair, reviews=reviews, form = form)
+
+    return render_template('pair.html', pair=pair, reviews=limited_reviews.items, form = form, show = show_rating, next_url=next_url, prev_url=prev_url)
