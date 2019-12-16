@@ -23,7 +23,7 @@ Templates:
 Session Management: users log in to keep track of their reviews and previous pairs they found
 
 Databases: 
-  - ser - store user information
+  - User - store user information
     - each user can create multiple history and reviews
   - Pair - stores pairs users look up - no duplicate pairs
     - each pair has multiple history and multiple reviews
