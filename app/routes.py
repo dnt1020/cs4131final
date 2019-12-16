@@ -6,9 +6,7 @@ from flask_login import current_user, login_user
 from app.models import User, Pair, History, Review
 from flask_login import logout_user, login_required
 from werkzeug.urls import url_parse
-from config import API_KEY
-
-# WHEN LOGGING OUT AND THEN LOGGING BACK IN AN ERROR HAPPENS
+from config import Config, API_KEY
 
 #for record last visit time:
 from datetime import datetime
@@ -118,7 +116,8 @@ def apiLookup():
         foodpairings = list()
         if u'pairings' in response.json():
             for x in response.json()[u'pairings']:
-                foodpairings.append(x.title())
+                foodpairings.append(x.encode("ascii").title())
+                print(x.encode("ascii"))
         print(foodpairings)
         if not foodpairings:
             return render_template("pairings.html", wine = wine, empty = "empty")
@@ -132,7 +131,8 @@ def apiLookup():
         winepairings = list()
         if u'pairedWines' in response.json():
             for x in response.json()[u'pairedWines']:
-                winepairings.append(x.title())
+                winepairings.append(x.encode("ascii").title())
+                print(x.encode("ascii"))
         print(winepairings)
         if not winepairings:
             return render_template("pairings.html", food = food, empty = "empty")
