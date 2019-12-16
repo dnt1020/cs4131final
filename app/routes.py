@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 import requests
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, RequestForm, ReviewForm
@@ -79,11 +79,12 @@ def register():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    pairings = User.query.join(User.history).filter(user.id == id)
+
+    history = History.query.filter(History.user_id == user.id)
 
     reviews = Review.query.filter(Review.user_id == user.id)
 
-    return render_template('user.html', user=user, reviews=reviews, history = pairings)
+    return render_template('user.html', user=user, reviews=reviews, historys = history)
 
 
 #For recording last visit time
@@ -116,35 +117,51 @@ def edit_profile():
 def apiLookup():
     form = RequestForm()
     if form.validate_on_submit():
-        wine = form.wine.data
-        food = form.food.data
+        wine = form.wine.data.title()
+        food = form.food.data.title()
     else:
-        print("nonvalid")
-        return render_template("index.html", form=form)
+        return render_template("pairings.html", food = "Invalid entry", empty = "empty")
 
     if wine != "":
         url = "https://api.spoonacular.com/food/wine/dishes?wine=" + wine  + "&apiKey=" + API_KEY
         response = requests.get(url)
         foodpairings = list()
-        for x in response.json()[u'pairings']:
-            foodpairings.append(x.encode("ascii"))
-            print(x.encode("ascii"))
-        return render_template("pairings.html", wine = wine, foodpairings = foodpairings)
+        if u'pairings' in response.json():
+            for x in response.json()[u'pairings']:
+                foodpairings.append(x.encode("ascii").title())
+                print(x.encode("ascii"))
+        print(foodpairings)
+        if not foodpairings:
+            return render_template("pairings.html", wine = wine, empty = "empty")
+        text = ""
+        if u'text' in response.json():
+            text = response.json()[u'text']
+        return render_template("pairings.html", wine = wine, text = text, foodpairings = foodpairings)
     else:
         url = "https://api.spoonacular.com/food/wine/pairing?food=" + food + "&apiKey=" + API_KEY
         response = requests.get(url)
         winepairings = list()
-        for x in response.json()[u'pairedWines']:
-            winepairings.append(x.encode("ascii"))
-            print(x.encode("ascii"))
-        return render_template("pairings.html", food = food, winepairings = winepairings)
+        if u'pairedWines' in response.json():
+            for x in response.json()[u'pairedWines']:
+                winepairings.append(x.encode("ascii").title())
+                print(x.encode("ascii"))
+        print(winepairings)
+        if not winepairings:
+            return render_template("pairings.html", food = food, empty = "empty")
+        text = ""
+        if u'pairingText' in response.json():
+            text = response.json()[u'pairingText']
+        return render_template("pairings.html", food = food, text = text, winepairings = winepairings)
 
-## CALLED FROM JS AFTER USER PRESSES A PAIR 
-@app.route('/history', methods=['GET', 'POST'])
+## CALLED FROM JS AFTER USER PRESSES A PAIR
+@app.route('/history')
 @login_required
 def history():
     wine = request.args.get('wine', 1)
     food = request.args.get('food', 1)
+
+    print("food:" + food)
+    print("wine:" + wine)
 
     ##Check if pairing already exists
     checkEntry = Pair.query.filter(Pair.wine == wine, Pair.food == food)
@@ -168,14 +185,21 @@ def history():
     db.session.add(history)
     db.session.commit()
     print('added history??')
+    print(pair.id)
 
-    return "success"
+    return jsonify({'pairid': pair.id})
 
 #### HANDLE IF PAIRING ID DOESN'T EXIST
 
 @app.route('/pairing/<id>', methods=['GET', 'POST'])
 @login_required
 def pairing(id):
+
+    pair = Pair.query.filter_by(id = id).first_or_404()
+
+    reviews = Review.query.filter(Review.pair_id == id)
+
+    pairings = History.query.filter(History.user_id == current_user.id)
 
     ## CHECK TO MAKE SURE WAS GIVEN THE PAIRING TO BE ABLE TO MAKE A REVIEW
     form = ReviewForm()
@@ -184,11 +208,5 @@ def pairing(id):
         review = Review(body = form.review.data, rating = form.rate.data, author = current_user, pairing = Pair.query.get(id))
         db.session.add(review)
         db.session.commit()
-        flash('Review updated')
-        return redirect(url_for('index'))
-
-    pair = Pair.query.filter_by(id = id).first_or_404()
-
-    reviews = Review.query.filter(Review.pair_id == id)
-
+    
     return render_template('pair.html', pair=pair, reviews=reviews, form = form)

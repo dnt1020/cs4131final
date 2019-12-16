@@ -3,24 +3,75 @@
         <link rel="stylesheet" href="/static/microblog.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script type="text/javascript" src="/static/microblog.js"></script>
-        {% if title %}
-        <title>{{ title }} - microblog</title>
-        {% else %}
-        <title>microblog</title>
-        {% endif %}
+        <meta charset="utf-8">
+        <title>Wine Pairings</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="Dat Nguyen and Moira Southern">
+        <!-- styles -->
+        <link href="/static/assets/css/bootstrap.css" rel="stylesheet">
+        <link href="/static/assets/css/bootstrap-responsive.css" rel="stylesheet">
+        <link href="/static/assets/css/prettyPhoto.css" rel="stylesheet">
+        <link href="/static/assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+        <link href="/static/assets/css/flexslider.css" rel="stylesheet">
+        <link href="/static/assets/css/style.css" rel="stylesheet">
+        <link href="/static/assets/color/default.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Droid+Serif:400,600,400italic|Open+Sans:400,600,700" rel="stylesheet">
+      
+        <!-- fav and touch icons -->
+        <link rel="shortcut icon" href="/static/assets/ico/favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/static/assets/ico/apple-touch-icon-144-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/static/assets/ico/apple-touch-icon-114-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/static/assets/ico/apple-touch-icon-72-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" href="/static/assets/ico/apple-touch-icon-57-precomposed.png">
+      
+        <!-- =======================================================
+          Theme Name: Lumia
+          Theme URL: https://bootstrapmade.com/lumia-bootstrap-business-template/
+          Author: BootstrapMade.com
+          Author URL: https://bootstrapmade.com
+        ======================================================= -->
     </head>
+
     <body>
-        <div>
-            Microblog:
-            <a href="{{ url_for('index') }}">Home</a>
-            {% if current_user.is_anonymous %}
-            <a href="{{ url_for('login') }}">Login</a>
-            {% else %}
-            <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-            {% endif %}
+        <header>
+            <!-- Navbar
+          ================================================== -->
+            <div class="navbar navbar-static-top">
+              <div class="navbar-inner">
+                <div class="container">
+                  <div class="logo">
+                    <h1 class="title">Wine and Food Pairings</h1>
+                  </div>
+                  <!-- top menu -->
+                  <div class="navigation">
+                    <nav>
+                      <ul class="nav topnav">
+                        <li>
+                          <a href="{{ url_for('index') }}">Home</a>
+                        </li>
+                        {% if current_user.is_anonymous %}
+                          <li>
+                            <a href="{{ url_for('login') }}">Login</a>
+                          </li>
+                        {% else %}
+                          <li>
+                            <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
+                          </li>
+                          <li>
+                            <a href="{{ url_for('logout') }}">Logout</a>
+                          </li>
+                        {% endif %}
+                        </div>
+                      </ul>
+                    </nav>
+                  </div>
+                  <!-- end menu -->
+      
+                </div>
+              </div>
             </div>
-        <hr>
+        </header>
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         <ul>
@@ -30,6 +81,50 @@
         </ul>
         {% endif %}
         {% endwith %}
-        {% block content %}{% endblock %}
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+        </section>
+        <!-- Footer
+    ================================================== -->
+        <footer class="footer">
+        <div class="container">
+            <h5>CSCI 4131 Final Project by Dat Nguyen and Moira Southern</h5>
+            <ul class="regular">
+                <li><a href="https://github.com/dnt1020/csci4131final">Github Link</a></li>
+            </ul>
+        </div>
+        <div class="verybottom">
+            <div class="container">
+            <div class="row">
+                <div class="span6">
+                <p>
+                    &copy; Lumia - All right reserved
+                </p>
+                </div>
+                <div class="span6">
+                <div class="pull-right">
+                    <div class="credits">
+                    <!--
+                        All the links in the footer should remain intact.
+                        You can delete the links only if you purchased the pro version.
+                        Licensing information: https://bootstrapmade.com/license/
+                        Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/buy/?theme=Lumia
+                    -->
+                    Created by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        </footer>
+
+    </div>
+    <!-- end wrapper -->
+    <a href="#" class="scrollup"><i class="icon-chevron-up icon-square icon-48 active"></i></a>
+
     </body>
+
+    
 </html>

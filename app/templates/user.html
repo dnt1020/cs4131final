@@ -5,7 +5,7 @@
 {% block content %}
     <table>
         <tr valign="top">
-          <td><img src="{{ user.avatar(128) }}"></td>
+          <td><img src="/static/profile.png" style="width:100px;height:100px;"></td>
           <td>
               <h1>User: {{ user.username }}</h1>
               {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
@@ -17,14 +17,15 @@
         </tr>
     </table>
     <hr>
+    <h1 class="header">Reviews:</h1>
     {% for review in reviews %}
         {% include '_review.html' %}
     {% endfor %}
     <br><br>
     <hr>
-    {% for pair in history %}
-        <p> hello </p>
-        <br>
+    <h1 class="header">History:</h1>
+    {% for history in historys %}
+          {% include '_history.html' %}
     {% endfor %}
 
 {% endblock %}

@@ -1,27 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hi, {{ current_user.username }}!</h1>
-    
-    {% for review in reviews %}
-    <div><p>{{ review.author.username }} says: <b>{{ review.body }}</b></p></div>
-    {% endfor %}
-
+    <div class="heading">
+        <h1>Hi, {{ current_user.username }}!</h1>
+    </div>
     <form action="/pairs" method="post">
-        {{ form.hidden_tag() }}
-        {{ form.food.label }}
-        {{ form.food }}
+        <h1>Search for pairings</h1>
+        <div class="call-action">
+            {{ form.hidden_tag() }}
 
-        <br>
-        <br>
+            <p>Choose what to search by: </p>
 
-        {{ form.wine.label }}
-        {{ form.wine }}
+            <select id="selector" onchange="selectSearch()">
+                <option value="Food">Food</option>
+                <option value="Wine">Wine</option>
+            </select>
 
-        <br>
-        <br>
+            <div id="foodsubmit">
+                {{ form.food }}
+            </div>
+            
+            <div id="winesubmit">
+                {{ form.wine }}
+            </div>
+        
+            <br>
+            <br>
 
-        {{ form.submit() }}
-
+            {{ form.submit() }}
+        </div>
     </form>
 {% endblock %}

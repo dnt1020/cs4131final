@@ -1,0 +1,9 @@
+<table>
+    <tr valign="top">
+        <td rowspan="2"><a href="{{ url_for('pairing', id=history.pairing.id) }}"><img src="/static/pair.png" style="width:50px;height:50px;"></a></td>
+        <td><a href="{{ url_for('pairing', id=history.pairing.id) }}">{{ history.pairing.wine }} and {{ history.pairing.food }}</a></td>
+    </tr>
+    <tr>
+        <td>Time: {{ history.time }}</td>
+    </tr>
+</table>

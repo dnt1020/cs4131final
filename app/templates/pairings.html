@@ -1,20 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main>
+<div class="container">
     {% if wine %}
-        <h2 id="main">{{ wine }}</h2>
+        <h1 class="heading">Food pairings for</h1>
+        <h1 id = "main" class="heading">{{ wine }}</h1>
+        <p>{{ text }}</p>
     {% endif %}
+    {% if food %}
+        <h1 class="heading">Wine pairings for</h1>
+        <h1 id = "main" class="heading">{{ food }}</h1>
+        <p>{{ text }}</p>
+    {% endif %}
+</div>
+
+<div class="container">
     {% for food in foodpairings: %}
-        <div class="wordbox" onclick="getWord(this, true)">{{ food }}</div>
+        <div class="btn btn-large btn-theme" onclick="getWord(this, false)">{{ food }}</div>
     {% endfor %}
 
-    {% if food %}
-        <h2 id="main"> {{ food }}</h2>
-    {% endif %}
     {% for wine in winepairings: %}
-        <div class="wordbox" onclick="getWord(this, false)">{{ wine }}</div>
+        <div class="btn btn-large btn-theme" onclick="getWord(this, true)">{{ wine }}</div>
     {% endfor %}
-</main>
+
+    {% if empty %}
+        <div>None found try different search</div>
+        <a href="{{ url_for('index') }}">Back to search</a>
+    {% endif %}
+</div>
+
+<br>
+<br>
+    
 {% endblock %}
 

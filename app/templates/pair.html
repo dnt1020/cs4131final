@@ -3,38 +3,46 @@
 {% block content %}
   <table>
       <tr valign="top">
-        <td><img src="{{ pair.pic(128) }}"></td>
-        <td>
-            <h1>Wine: {{ pair.wine }} and Food: {{ pair.food }}</h1>
-            <p> Description of some sort?</p>
+        <td rowspan="2"><img src="/static/pair.png" style="width:100px;height:100px;"></td>
+        <td class="topProfile">
+            <h1>Wine: {{ pair.wine }}
         </td>
+      </tr>
+      <tr>
+        <td><h1>Food: {{ pair.food }}</h1></td>
       </tr>
   </table>
   <hr>
 
-  {% for review in reviews %}
-      {% include '_review.html' %}
-  {% endfor %}
+  <div class="container">
+    {% for review in reviews %}
+        {% include '_review.html' %}
+    {% endfor %}
+  </div>
 
-  <br><br>
-  <form action="" method="post">
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.review.label }}<br>
-        {{ form.review(cols=32, rows=4) }}<br>
-        {% for error in form.review.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.rate.label }}<br>
-        {{ form.rate(cols=32, rows=4) }}<br>
-        {% for error in form.rate.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>{{ form.submit() }}</p>
-  </form>
+  <div class="contianer">
+    <br><br>
+    <form action="" method="post">
+      {{ form.hidden_tag() }}
+      <p>
+          {{ form.review.label }}<br>
+          {{ form.review(cols=32, rows=4) }}<br>
+          {% for error in form.review.errors %}
+          <span style="color: red;">[{{ error }}]</span>
+          {% endfor %}
+      </p>
+      <p>
+          {{ form.rate.label }}<br>
+          {{ form.rate(cols=32, rows=4) }}<br>
+          {% for error in form.rate.errors %}
+          <span style="color: red;">[{{ error }}]</span>
+          {% endfor %}
+      </p>
+      <p>{{ form.submit() }}</p>
+    </form>
+  </div>
+
+  
 
 
 {% endblock %}
