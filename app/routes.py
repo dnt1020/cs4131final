@@ -127,7 +127,7 @@ def apiLookup():
         foodpairings = list()
         if u'pairings' in response.json():
             for x in response.json()[u'pairings']:
-                foodpairings.append(x.encode("ascii").title())
+                foodpairings.append(x.decode('UTF-8').title())
                 print(x.encode("ascii"))
         print(foodpairings)
         if not foodpairings:
