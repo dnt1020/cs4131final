@@ -1,7 +1,7 @@
 <table>
     <tr valign="top">
         <td rowspan="2"><a href="{{ url_for('user', username=review.author.username) }}"><img src="/static/profile.png" style="width:50px;height:50px;"></a></td>
-        <td><a href="{{ url_for('pairing', id=review.pairing.id) }}">{{ review.pairing.wine }} and {{ review.pairing.food }}</a></td>       
+        <td><a href="{{ url_for('user', username=review.author.username) }}">{{ review.author.username }}: </a><a href="{{ url_for('pairing', id=review.pairing.id) }}">  {{ review.pairing.wine }} and {{ review.pairing.food }}</a></td>       
     </tr>
     <tr>
         <td>Score: {{ review.rating }} {{ review.body }}</td>

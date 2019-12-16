@@ -176,17 +176,6 @@ def history():
 @login_required
 def pairing(id):
 
-    pair = Pair.query.filter_by(id = id).first_or_404()
-    reviews = Review.query.filter(Review.pair_id == id)
-
-    page = request.args.get('page', 1, type=int)
-    limited_reviews = reviews.paginate(page, app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('pairing',id=id, page=limited_reviews.next_num) \
-        if limited_reviews.has_next else None
-    prev_url = url_for('pairing',id=id, page=limited_reviews.prev_num) \
-        if limited_reviews.has_prev else None
-
-
     pairings = History.query.filter(History.user_id == current_user.id)
     show_rating = True
     q = History.query.filter(History.user_id == current_user.id, History.pair_id == id).first()
@@ -198,5 +187,15 @@ def pairing(id):
         review = Review(body = form.review.data, rating = form.rate.data, author = current_user, pairing = Pair.query.get(id))
         db.session.add(review)
         db.session.commit()
+
+    pair = Pair.query.filter_by(id = id).first_or_404()
+    reviews = Review.query.filter(Review.pair_id == id)
+
+    page = request.args.get('page', 1, type=int)
+    limited_reviews = reviews.paginate(page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('pairing',id=id, page=limited_reviews.next_num) \
+        if limited_reviews.has_next else None
+    prev_url = url_for('pairing',id=id, page=limited_reviews.prev_num) \
+        if limited_reviews.has_prev else None
 
     return render_template('pair.html', pair=pair, reviews=limited_reviews.items, form = form, show = show_rating, next_url=next_url, prev_url=prev_url)
