@@ -142,7 +142,7 @@ def apiLookup():
         winepairings = list()
         if u'pairedWines' in response.json():
             for x in response.json()[u'pairedWines']:
-                winepairings.append(x.encode("ascii").title())
+                winepairings.append(x.decode('UTF-8').title())
                 print(x.encode("ascii"))
         print(winepairings)
         if not winepairings:
