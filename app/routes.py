@@ -116,8 +116,7 @@ def apiLookup():
         foodpairings = list()
         if u'pairings' in response.json():
             for x in response.json()[u'pairings']:
-                foodpairings.append(x.encode("ascii").title())
-                print(x.encode("ascii"))
+                foodpairings.append(x.title())
         print(foodpairings)
         if not foodpairings:
             return render_template("pairings.html", wine = wine, empty = "empty")
@@ -131,8 +130,7 @@ def apiLookup():
         winepairings = list()
         if u'pairedWines' in response.json():
             for x in response.json()[u'pairedWines']:
-                winepairings.append(x.encode("ascii").title())
-                print(x.encode("ascii"))
+                winepairings.append(x.title())
         print(winepairings)
         if not winepairings:
             return render_template("pairings.html", food = food, empty = "empty")
