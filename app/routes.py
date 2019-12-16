@@ -6,10 +6,9 @@ from flask_login import current_user, login_user
 from app.models import User, Pair, History, Review
 from flask_login import logout_user, login_required
 from werkzeug.urls import url_parse
+from config import API_KEY
 
 # WHEN LOGGING OUT AND THEN LOGGING BACK IN AN ERROR HAPPENS
-
-API_KEY = "3495005704df46f9a4bad5b39efc4023"
 
 #for record last visit time:
 from datetime import datetime
