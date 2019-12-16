@@ -2,11 +2,12 @@
 Made a website for users to look up wine and food pairings and write reviews for them. 
 
 Main features:
-  - User can look up pairings
-  - Pairings is stored as history
-  - Reviews can be left for pairings
+  - User can look up suggested pairings
+  - Pairings is stored as history - can look at others history 
+  - Reviews from other users can be viewed
+  - Post reviews of pairs
 
-Walkthrough covering features: register and log in, choose food/wine to look up (try food = steak), click a pairing after look up to see pairing page, look at reviews and write reviews for pairings, click on profile to look at history and reviews you have left
+Walkthrough covering features: register and log in (try username = goldy, password = gopher), choose food/wine to look up (try food = steak or wine = merlot), click a pairing after look up to see pairing page, look at reviews and write reviews for pairings, click on profile to look at history and reviews you have left. 
 
 Here are the requirements for an A for the project and how they are covered (Left out some extra controller, templates etc. used in website).
 
