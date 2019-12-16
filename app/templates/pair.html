@@ -18,8 +18,16 @@
     {% for review in reviews %}
         {% include '_review.html' %}
     {% endfor %}
+    {% if prev_url %}
+    <a href="{{ prev_url }}">Previous reviews</a>
+    {% endif %}
+    {% if next_url %}
+    <a href="{{ next_url }}">More reviews</a>
+    {% endif %}
   </div>
 
+
+  {% if show == True %}
   <div class="contianer">
     <br><br>
     <form action="" method="post">
@@ -41,8 +49,8 @@
       <p>{{ form.submit() }}</p>
     </form>
   </div>
+  {% endif %}
 
-  
 
 
 {% endblock %}
